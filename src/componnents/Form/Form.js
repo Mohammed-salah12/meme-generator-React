@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
 import './Form.css'
-import memesData from "./memesData";
 export default function From() {
     const [meme, setMeme] = React.useState({
         topText: '',
@@ -8,27 +7,30 @@ export default function From() {
         randomImage: 'https://i.imgflip.com/30b1gx.jpg'
     })
 
-    const [FormData, setFormData] = React.useState({
-        topText: '',
-        bottomText: ''
-    })
+    const [allMemes, setAllMemes] = React.useState([]);
 
+
+
+    useEffect(() => {
+        fetch(`https://api.imgflip.com/get_memes`)
+            .then(res => res.json())
+            .then(data => setAllMemes(data.data.memes))
+    }, [])
     function handelChange(event) {
-        setFormData(prevState => {
+        setMeme(prevState => {
             return {
                 ...prevState,
                 [event.target.name]: event.target.value
             }
         });
-        console.log(FormData)
+        console.log(meme)
     };
 
 
     function getMemeUrl(event) {
         event.preventDefault()
-        const MemeArray = memesData.data.memes;
-        const RandomIndex = Math.floor(Math.random() * MemeArray.length);
-        const url = MemeArray[RandomIndex].url;
+        const RandomIndex = Math.floor(Math.random() * allMemes.length);
+        const url = allMemes[RandomIndex].url;
         setMeme(prevState => ({
             ...prevState,
             randomImage: url,
@@ -44,11 +46,11 @@ export default function From() {
                     <div className="inputsHolder">
                         <div className="topTextDivHolder">
                             <p className="upperText">Top text</p>
-                            <input type="text" placeholder="top text" value={FormData.topText} name="topText" onChange={handelChange} />
+                            <input type="text" placeholder="top text" value={meme.topText} name="topText" onChange={handelChange} />
                         </div>
                         <div className="bottomTextDivHolder">
                             <p className="upperText">bottom text</p>
-                            <input type="text" placeholder="bottom text" value={FormData.bottomText} name="bottomText" onChange={handelChange} />
+                            <input type="text" placeholder="bottom text" value={meme.bottomText} name="bottomText" onChange={handelChange} />
                         </div>
                     </div>
                 </div>
@@ -56,8 +58,8 @@ export default function From() {
                 >  Get a new meme image  🖼</button>
                 <div className="texts">
                     <div className="imgHandeler">
-                        <h2 className="toptext">{FormData.topText}</h2>
-                        <h2 className="bottomtext">{FormData.bottomText}</h2>
+                        <h2 className="toptext">{meme.topText}</h2>
+                        <h2 className="bottomtext">{meme.bottomText}</h2>
 
                     </div>
 
